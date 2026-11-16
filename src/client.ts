@@ -42,7 +42,7 @@ function showAuth(type:string){authType=type;$('authTitle').textContent=type==='
 };
 window.addEventListener('message',e=>{
  if(e.origin!==location.origin||e.source!==parent||e.data?.type!=='configure')return;
- try{if(connecting||authenticated)throw new Error('Disconnect before changing server settings.');const s=validate(e.data.settings);core.configureServers(s.idServer,s.relayServer,s.serverKey);configured=true;controls();status('Ready to connect through your server.');parent.postMessage({type:'configured'},location.origin);}catch(err){parent.postMessage({type:'config-error',message:(err as Error).message},location.origin);}
+ try{if(connecting||authenticated)throw new Error('Disconnect before changing server settings.');const s=validate(e.data.settings);core.configureServers(s.idServer,s.relayServer,s.serverKey);configured=true;controls();$('empty').querySelector('p')!.textContent='Enter a device ID above to start your session.';status('Ready to connect through your server.');parent.postMessage({type:'configured'},location.origin);}catch(err){parent.postMessage({type:'config-error',message:(err as Error).message},location.origin);}
 });
 $('connectForm').addEventListener('submit',e=>{
  e.preventDefault();if(!configured||connecting||authenticated)return;

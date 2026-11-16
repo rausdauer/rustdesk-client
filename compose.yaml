@@ -3,6 +3,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prebuilt
+    environment:
+      RUSTDESK_MANAGED: "true"
+      RUSTDESK_SERVER_KEY: "${RUSTDESK_SERVER_KEY:?Copy your existing hbbs public key into .env first}"
+      RUSTDESK_ID_UPSTREAM: "${RUSTDESK_ID_UPSTREAM:-vnc.edvlab.tuwien.ac.at:21118}"
+      RUSTDESK_RELAY_UPSTREAM: "${RUSTDESK_RELAY_UPSTREAM:-vnc.edvlab.tuwien.ac.at:21119}"
     ports:
       - "127.0.0.1:8080:80"
     restart: unless-stopped

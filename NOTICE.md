@@ -14,3 +14,5 @@ Local engine changes (2026-11-16):
 - Display the OSS zero-valued ID_NOT_EXIST response as an actionable error.
 
 Generated protobufs, keyboard mappings, translations and protocol code remain from the pinned upstream revision. The package includes the vendored TypeScript sources and their source maps. Dependencies are locked by package-lock.json. The interface only exposes the subset of engine features documented in README.md.
+
+Student deployment update: Nginx now proxies ID/relay WebSockets inside the app container. Startup settings preconfigure the server key and the page uses its own origin, hiding server fields from students. Editable static hosting remains available.

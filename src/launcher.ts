@@ -7,7 +7,7 @@ function apply(){if(ready&&active)frame.contentWindow?.postMessage({type:'config
 window.addEventListener('message',e=>{
  if(e.origin!==location.origin||e.source!==frame.contentWindow)return;
  if(e.data?.type==='ready'){ready=true;apply();}
- if(e.data?.type==='configured')status('Settings applied. Enter a device ID to connect.');
+ if(e.data?.type==='configured')status('Server configured. Enter a device ID to connect.');
  if(e.data?.type==='config-error')status(String(e.data.message),true);
 });
 $('settings').addEventListener('submit',e=>{e.preventDefault();try{active=validate({idServer:$('idServer').value,relayServer:$('relayServer').value,serverKey:$('serverKey').value});
@@ -15,4 +15,21 @@ $('settings').addEventListener('submit',e=>{e.preventDefault();try{active=valida
  apply();if(!ready)status('Settings validated. Waiting for the connection engine…');
 }catch(err){status((err as Error).message,true);}});
 $('clear').addEventListener('click',()=>{try{localStorage.removeItem('rustdesk-portal-settings');$('remember').checked=false;status('Saved settings cleared. Current tab settings remain active.');}catch{status('Browser storage is unavailable.',true);}});
-try{const stored=localStorage.getItem('rustdesk-portal-settings');if(stored){active=validate(JSON.parse(stored));for(const id of ['idServer','relayServer','serverKey'] as const)$(id).value=active[id];$('remember').checked=true;}}catch{status('Saved settings could not be loaded. Enter them again.',true);}
+async function bootstrap(){
+ try{
+  const response=await fetch('./portal-config.json',{cache:'no-store'});
+  if(!response.ok)throw new Error('Server configuration could not be loaded. Contact the lab administrator.');
+  const config=await response.json();
+  if(config.managed===true){
+   document.body.classList.add('managed');
+   document.querySelector('h1')!.innerHTML='Your lab.<br>In a browser.';
+   document.querySelector('.intro')!.textContent='Enter a device ID to connect. Your university server is already configured.';
+   document.querySelector('.workspaceFoot')!.textContent='Your lab connection is preconfigured. Device passwords are never saved by this interface.';
+   status('Loading university server settings…');
+   active=validate({idServer:location.origin,relayServer:location.origin,serverKey:config.serverKey});
+   apply();return;
+  }
+  try{const stored=localStorage.getItem('rustdesk-portal-settings');if(stored){active=validate(JSON.parse(stored));for(const id of ['idServer','relayServer','serverKey'] as const)$(id).value=active[id];$('remember').checked=true;apply();}}catch{status('Saved settings could not be loaded. Enter them again.',true);}
+ }catch(err){status((err as Error).message,true);}
+}
+bootstrap();

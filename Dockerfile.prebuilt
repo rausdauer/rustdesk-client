@@ -1,5 +1,7 @@
 FROM nginx:1.28-alpine
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY templates/default.conf.template /etc/nginx/templates/default.conf.template
+COPY docker-entrypoint.d/15-rustdesk-config.sh /docker-entrypoint.d/15-rustdesk-config.sh
 COPY dist/ /usr/share/nginx/html/
-RUN chmod -R a+rX /usr/share/nginx/html && chmod a+r /etc/nginx/conf.d/default.conf
+RUN chmod -R a+rX /usr/share/nginx/html && chmod a+r /etc/nginx/templates/default.conf.template && chmod a+rx /docker-entrypoint.d/15-rustdesk-config.sh
+ENV RUSTDESK_ID_UPSTREAM=vnc.edvlab.tuwien.ac.at:21118 RUSTDESK_RELAY_UPSTREAM=vnc.edvlab.tuwien.ac.at:21119 RUSTDESK_MANAGED=true
 EXPOSE 80
